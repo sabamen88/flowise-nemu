@@ -1,0 +1,21 @@
+# Nemu AI — Custom Flowise Image
+# Lightweight layer on top of official Flowise with auto-bootstrap
+FROM flowiseai/flowise:latest
+
+USER root
+
+# Copy Nemu bootstrap script
+COPY nemu-startup.js /usr/local/lib/nemu-startup.js
+RUN chmod 755 /usr/local/lib/nemu-startup.js
+
+# Copy nemu-specific custom node files if they exist in /app/packages/components/nodes
+COPY packages/components/nodes/NemuCatalog/ /app/packages/components/nodes/NemuCatalog/
+COPY packages/components/nodes/NemuOrders/ /app/packages/components/nodes/NemuOrders/
+COPY packages/components/nodes/NemuStats/ /app/packages/components/nodes/NemuStats/
+
+USER node
+
+EXPOSE 3000
+
+# Run bootstrap (non-fatal) then start Flowise
+CMD ["sh", "-c", "node /usr/local/lib/nemu-startup.js 2>&1 || true; flowise start"]
