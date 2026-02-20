@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: nemu-flowise
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: standard  # 2GB RAM needed for Flowise (starter 512MB is too small)
+    region: singapore
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: FLOWISE_USERNAME
+        value: admin
+      - key: FLOWISE_PASSWORD
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /data/flowise
+      - key: APIKEY_PATH
+        value: /data/flowise
+      - key: SECRETKEY_PATH
+        value: /data/flowise
+      - key: LOG_PATH
+        value: /data/logs
+      - key: BLOB_STORAGE_PATH
+        value: /data/storage
+      - key: OPENAI_API_KEY
+        sync: false  # Set to MiniMax API key in Render dashboard
+      - key: OPENAI_BASE_URL
+        value: https://api.minimax.io/v1
+      - key: NEON_DATABASE_URL
+        sync: false  # Set to Neon Postgres connection string in Render dashboard
+    disk:
+      name: flowise-data
+      mountPath: /data
+      sizeGB: 10
+    healthCheckPath: /
+    autoDeploy: true
