@@ -4,6 +4,7 @@ import GithubSSO from '../enterprise/sso/GithubSSO'
 import GoogleSSO from '../enterprise/sso/GoogleSSO'
 
 export const WHITELIST_URLS = [
+    '/api/v1/nemu-setup',
     '/api/v1/verify/apikey/',
     '/api/v1/chatflows/apikey/',
     '/api/v1/public-chatflows',

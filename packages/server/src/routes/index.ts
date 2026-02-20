@@ -35,6 +35,7 @@ import openaiAssistantsRouter from './openai-assistants'
 import openaiAssistantsFileRouter from './openai-assistants-files'
 import openaiAssistantsVectorStoreRouter from './openai-assistants-vector-store'
 import openaiRealtimeRouter from './openai-realtime'
+import nemuSetupRouter from './nemu-setup'
 import pingRouter from './ping'
 import predictionRouter from './predictions'
 import promptListsRouter from './prompts-lists'
@@ -70,6 +71,7 @@ import { IdentityManager } from '../IdentityManager'
 
 const router = express.Router()
 
+router.use('/nemu-setup', nemuSetupRouter)
 router.use('/ping', pingRouter)
 router.use('/apikey', apikeyRouter)
 router.use('/assistants', assistantsRouter)

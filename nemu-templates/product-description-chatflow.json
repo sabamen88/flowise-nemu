@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "chatOpenAI_0",
+      "position": { "x": 300, "y": 100 },
+      "type": "customNode",
+      "data": {
+        "label": "MiniMax M2.5",
+        "name": "chatOpenAI",
+        "version": 6,
+        "type": "ChatOpenAI",
+        "baseClasses": ["ChatOpenAI", "BaseChatModel", "BaseLanguageModel"],
+        "category": "Chat Models",
+        "inputs": {
+          "modelName": "MiniMax-Text-01",
+          "openAIApiKey": "{{MINIMAX_API_KEY}}",
+          "baseURL": "https://api.minimax.io/v1",
+          "temperature": 0.8,
+          "maxTokens": 400,
+          "streaming": false
+        }
+      }
+    },
+    {
+      "id": "promptTemplate_0",
+      "position": { "x": 300, "y": 350 },
+      "type": "customNode",
+      "data": {
+        "label": "Product Description Prompt",
+        "name": "promptTemplate",
+        "version": 1,
+        "type": "PromptTemplate",
+        "baseClasses": ["PromptTemplate", "BaseStringPromptTemplate", "BasePromptTemplate"],
+        "category": "Prompts",
+        "inputs": {
+          "template": "Kamu adalah copywriter e-commerce profesional untuk platform Nemu AI Indonesia.\n\nBuat deskripsi produk yang menarik dan persuasif untuk platform Tokopedia/Shopee style.\n\nInformasi produk:\n- Nama produk: {product_name}\n- Kategori: {category}\n- Kata kunci: {keywords}\n\nATURAN PENULISAN:\n1. Tulis dalam Bahasa Indonesia yang natural dan menarik\n2. Panjang: 3-4 kalimat (sekitar 60-80 kata)\n3. Mulai dengan kalimat hook yang menarik perhatian pembeli\n4. Sebutkan keunggulan utama dan manfaat produk\n5. Akhiri dengan ajakan beli yang soft (tidak memaksa)\n6. Gunakan kata-kata positif: berkualitas, terpercaya, terbaik, premium, original\n7. Jangan gunakan ALL CAPS berlebihan\n8. Format: paragraf biasa, bukan bullet points\n\nTulis deskripsi produk sekarang:",
+          "inputVariables": ["product_name", "category", "keywords"]
+        }
+      }
+    },
+    {
+      "id": "llmChain_0",
+      "position": { "x": 700, "y": 200 },
+      "type": "customNode",
+      "data": {
+        "label": "Generate Description",
+        "name": "llmChain",
+        "version": 3,
+        "type": "LLMChain",
+        "baseClasses": ["LLMChain", "BaseChain"],
+        "category": "Chains",
+        "inputs": {
+          "model": "{{chatOpenAI_0.data.instance}}",
+          "prompt": "{{promptTemplate_0.data.instance}}",
+          "outputKey": "description"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "chatOpenAI_0",
+      "target": "llmChain_0",
+      "sourceHandle": "chatOpenAI_0-output-chatOpenAI-ChatOpenAI",
+      "targetHandle": "llmChain_0-input-model-BaseChatModel"
+    },
+    {
+      "id": "e2",
+      "source": "promptTemplate_0",
+      "target": "llmChain_0",
+      "sourceHandle": "promptTemplate_0-output-promptTemplate-PromptTemplate",
+      "targetHandle": "llmChain_0-input-prompt-BasePromptTemplate"
+    }
+  ],
+  "chatflowName": "Nemu Product Description Generator",
+  "description": "Generate deskripsi produk Tokopedia/Shopee style dalam Bahasa Indonesia menggunakan MiniMax M2.5. Input: nama produk, kategori, dan kata kunci. Output: 3-4 kalimat deskripsi yang persuasif.",
+  "isPublic": false,
+  "exampleInputs": {
+    "product_name": "Tas Selempang Kulit Sintetis Premium",
+    "category": "Tas & Koper",
+    "keywords": "tas wanita, kekinian, waterproof, slot kartu banyak"
+  }
+}

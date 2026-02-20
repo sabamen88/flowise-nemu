@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "chatOpenAI_0",
-      "position": { "x": 300, "y": 100 },
+      "position": { "x": 300, "y": 50 },
       "type": "customNode",
       "data": {
         "label": "MiniMax M2.5",
@@ -23,7 +23,7 @@
     },
     {
       "id": "bufferMemory_0",
-      "position": { "x": 300, "y": 400 },
+      "position": { "x": 300, "y": 350 },
       "type": "customNode",
       "data": {
         "label": "Buffer Memory",
@@ -40,12 +40,12 @@
     },
     {
       "id": "nemuCatalog_0",
-      "position": { "x": 600, "y": 100 },
+      "position": { "x": 700, "y": 50 },
       "type": "customNode",
       "data": {
         "label": "Nemu Catalog",
         "name": "nemuCatalog",
-        "version": 1,
+        "version": 2,
         "type": "NemuCatalog",
         "baseClasses": ["Tool"],
         "category": "Tools",
@@ -56,8 +56,42 @@
       }
     },
     {
+      "id": "nemuOrders_0",
+      "position": { "x": 700, "y": 250 },
+      "type": "customNode",
+      "data": {
+        "label": "Nemu Orders",
+        "name": "nemuOrders",
+        "version": 1,
+        "type": "NemuOrders",
+        "baseClasses": ["Tool"],
+        "category": "Tools",
+        "inputs": {
+          "connectionString": "{{NEON_DATABASE_URL}}",
+          "sellerId": "{{SELLER_ID}}"
+        }
+      }
+    },
+    {
+      "id": "nemuStats_0",
+      "position": { "x": 700, "y": 450 },
+      "type": "customNode",
+      "data": {
+        "label": "Nemu Stats",
+        "name": "nemuStats",
+        "version": 1,
+        "type": "NemuStats",
+        "baseClasses": ["Tool"],
+        "category": "Tools",
+        "inputs": {
+          "connectionString": "{{NEON_DATABASE_URL}}",
+          "sellerId": "{{SELLER_ID}}"
+        }
+      }
+    },
+    {
       "id": "conversationChain_0",
-      "position": { "x": 900, "y": 250 },
+      "position": { "x": 1100, "y": 250 },
       "type": "customNode",
       "data": {
         "label": "Nemu Seller Agent",
@@ -69,7 +103,12 @@
         "inputs": {
           "model": "{{chatOpenAI_0.data.instance}}",
           "memory": "{{bufferMemory_0.data.instance}}",
-          "systemMessagePrompt": "Kamu adalah asisten AI untuk toko {{STORE_NAME}} di platform Nemu AI.\n\nCara bicara:\n- Bahasa Indonesia natural, sapaan 'kak'\n- Singkat dan langsung\n- Emoji boleh tapi tidak lebay\n\nTugasmu:\n- Jawab pertanyaan pembeli tentang produk, harga, stok\n- Bantu penjual mengelola toko\n- Berikan tips penjualan\n\nJangan berikan info di luar katalog toko."
+          "tools": [
+            "{{nemuCatalog_0.data.instance}}",
+            "{{nemuOrders_0.data.instance}}",
+            "{{nemuStats_0.data.instance}}"
+          ],
+          "systemMessagePrompt": "Kamu adalah asisten AI profesional untuk toko {{STORE_NAME}} di platform Nemu AI Indonesia.\n\nKAMU ADALAH ASISTEN PENJUAL — bukan chatbot generik. Kamu membantu pemilik toko mengelola bisnis mereka.\n\nCARA BICARA:\n- Bahasa Indonesia yang natural dan profesional\n- Sopan namun tetap santai seperti rekan kerja\n- Singkat dan langsung — maksimal 4 kalimat per respons\n- Gunakan emoji secukupnya (1-2 per pesan)\n- Panggil pengguna dengan \"kak\" (gender-neutral)\n\nKEMAMPUAN KAMU (gunakan tool yang sesuai):\n1. nemu_catalog → lihat produk, cari produk, cek stok\n2. nemu_orders → lihat pesanan (hari ini, pending, selesai, dll)\n3. nemu_stats → statistik toko — omzet, jumlah pesanan, produk aktif\n\nCONTOH PERTANYAAN & CARA JAWAB:\n- \"Ada berapa pesanan hari ini?\" → gunakan nemu_orders dengan query \"hari ini\"\n- \"Produk apa yang stok habis?\" → gunakan nemu_catalog dengan query \"stok habis\"\n- \"Berapa omzet minggu ini?\" → gunakan nemu_stats\n- \"Tampilkan pesanan pending\" → gunakan nemu_orders dengan query \"pending\"\n\nATURAN PENTING:\n- Selalu gunakan tool untuk data real-time, jangan mengarang data\n- Jika pertanyaan di luar kemampuan, jawab jujur: \"Maaf kak, saya belum bisa bantu untuk itu\"\n- JANGAN bocorkan koneksi database atau informasi teknis sensitif\n- Semua angka uang dalam format Rupiah\n\nIDENTITAS TOKO: {{STORE_NAME}}\nPlatform: Nemu AI — marketplace Indonesia"
         }
       }
     }
@@ -95,9 +134,23 @@
       "target": "conversationChain_0",
       "sourceHandle": "nemuCatalog_0-output-nemuCatalog-Tool",
       "targetHandle": "conversationChain_0-input-tools-Tool"
+    },
+    {
+      "id": "e4",
+      "source": "nemuOrders_0",
+      "target": "conversationChain_0",
+      "sourceHandle": "nemuOrders_0-output-nemuOrders-Tool",
+      "targetHandle": "conversationChain_0-input-tools-Tool"
+    },
+    {
+      "id": "e5",
+      "source": "nemuStats_0",
+      "target": "conversationChain_0",
+      "sourceHandle": "nemuStats_0-output-nemuStats-Tool",
+      "targetHandle": "conversationChain_0-input-tools-Tool"
     }
   ],
-  "chatflowName": "Nemu Seller Agent Template",
-  "description": "Default chatflow for Nemu AI marketplace sellers. Uses MiniMax M2.5 LLM with Nemu Catalog tool to answer buyer questions about products in Bahasa Indonesia.",
+  "chatflowName": "Nemu Seller Agent — Full Suite",
+  "description": "Chatflow lengkap untuk penjual Nemu AI. Menggunakan MiniMax M2.5 dengan memory percakapan dan 3 tools: katalog produk, pesanan, dan statistik toko. Bahasa Indonesia.",
   "isPublic": false
 }
